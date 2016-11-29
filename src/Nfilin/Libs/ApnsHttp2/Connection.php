@@ -78,20 +78,20 @@ class Connection extends CurlConnection
             curl_setopt($this->curl, CURLOPT_URL, $this->baseUrl . $receiver->path);
             $data = $message->json();
             $headers = [];
-            $headers['content-length'] = strlen($data);
-            $headers['apns-topic'] = $message->topic;
-            $headers['apns-expiration'] = $message->time_to_live ? (int)$message->time_to_live + time() : 0;
+            $headers[] = 'content-length: ' . strlen($data);
+            $headers[] = 'apns-topic: ' . $message->topic;
+            $headers[] = 'apns-expiration: ' . ($message->time_to_live ? (int)$message->time_to_live + time() : 0);
             switch ($message->priority) {
                 case 5:
                 case 'normal':
-                    $headers['apns-priority'] = 5;
+                    $headers[] = 'apns-priority: ' . 5;
                     break;
                 case 10:
                 case 'high':
-                    $headers['apns-priority'] = 10;
+                    $headers[] = 'apns-priority: ' . 10;
                     break;
                 default:
-                    $headers['apns-priority'] = 10;
+                    $headers[] = 'apns-priority: ' . 10;
             }
 
             curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
